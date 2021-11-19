@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: sexvalues.github.io
+Token: a4b68721e215753e21bda67aa32c3feb05e8ae3e7cd44deaa6bb28b67a7b5e47
