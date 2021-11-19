@@ -1,0 +1,195 @@
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-99715444-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-99715444-2');
+    </script>
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:400,700" rel="stylesheet">
+    <link href='style.css' rel='stylesheet' type='text/css'>
+    <title>SexValues Quiz</title>
+    <link rel="icon" type="x-icon" href="icon.png">
+    <link rel="shortcut icon" type="x-icon" href="icon.png">
+    <meta charset="utf-8">
+    <script type="application/javascript" src="questions_legacy.js"></script>
+    <script type="application/javascript" src="results_data.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+<h1>SexValues</h1>
+<hr>
+<h2 style="text-align:center;" id="question-number">Loading...</h2>
+<p class="question" id="question-text"></p>
+<button class="button" onclick="next_question(1.0)" style="background-color: #378039;">Strongly Agree</button> <br>
+<button class="button" onclick="next_question(0.5)" style="background-color: #52bf56;">Agree</button> <br>
+<button class="button" onclick="next_question(0.0)" style="background-color: #bbbbbb;">Neutral</button> <br>
+<button class="button" onclick="next_question(-0.5)" style="background-color: #f44336;">Disagree</button> <br>
+<button class="button" onclick="next_question(-1.0)" style="background-color: #b71c1c;">Strongly Disagree</button> <br>
+<button class="button" onclick="next_question(null)" style="background-color: #a9a9a9;">Don't Know/Understand</button>
+<br>
+<button class="small_button" onclick="prev_question()" id="back_button">Back</button>
+<button class="small_button_off" id="back_button_off">Back</button><br>
+
+<!-- JavaScript for the test itself -->
+<script>
+
+    // variables
+    var answers = new Object();     // Store user's answers
+    var qn = 0; // Current question order
+
+
+    // Populate questionsObject
+
+    var questionsObject = new Object();     // Question objects with ID keys
+    questions.forEach(populateQO);
+
+    function populateQO(value) {
+        questionsObject[value['id']] = value
+    }
+
+
+    // Populate & shuffle questionsOrder
+
+    var questionsOrder = Object.keys(questionsObject); //Array of shuffled question IDs
+    shuffleArray(questionsOrder);
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // Question initialization
+
+    init_question();
+
+    function init_question() {
+        $("#question-text").html(questionsObject[questionsOrder[qn]].question);
+        $("#question-number").html("Question " + (qn + 1) + " of " + (questionsOrder.length));
+
+
+
+        if (jQuery.isEmptyObject(answers)) {
+            $('#back_button').hide()
+            $('#back_button_off').show()
+        } else {
+            $('#back_button').show()
+            $('#back_button_off').hide()
+        }
+    }
+
+
+    // Next question
+
+    function next_question(answer) {
+        if (qn === questionsOrder.length) {
+            return;
+        }
+
+        answers[questionsOrder[qn]] = answer;
+        qn++;
+
+        if (qn < questionsOrder.length) {
+            init_question();
+        } else {
+            results();
+        }
+    }
+
+
+    // Previous question
+
+    function prev_question() {
+        if (jQuery.isEmptyObject(answers)) {
+            $('#back_button').hide()
+            $('#back_button_off').show()
+            return;
+        }
+        qn--;
+
+        delete answers[questionsOrder[qn]];
+
+        init_question();
+    }
+
+
+    // RESULTS
+
+    function results() {
+
+        window.sessionStorage.answers = JSON.stringify(answers);
+
+
+        // Calculate final results
+        pct = percentageCalculation();
+        window.sessionStorage.percentages = JSON.stringify(pct);
+
+        // prepare arguments
+        var args = '?';
+        for (const i in Object.keys(pct)) {
+            effectName = Object.keys(pct)[i]
+            args += `${effectName}=${pct[effectName]}`
+
+            var cycle = parseInt(i)
+            if (cycle + 1 !== Object.keys(pct).length) {
+                args += '&'
+            }
+        }
+
+        location.href = ((window.location.hostname == "") ? `feedback.html` : `results.html`) + args
+
+    }
+
+
+    // Calculate percentage
+
+    function percentageCalculation() {
+        // calc max
+        var max = new Object(); // Max possible scores
+        var score = new Object(); // User scores
+        var pct = new Object(); // Percentages
+
+        // prepare
+        for (const id in answers) {
+            for (const effectName in questionsObject[id].effect) {
+                max[effectName] = 0
+                score[effectName] = 0
+            }
+        }
+
+        // get max & scores
+        for (const id in answers) {
+            // dismiss "don't know"
+            if (answers[id] !== null) {
+                for (const effectName in questionsObject[id].effect) {
+                    max[effectName] += Math.abs(questionsObject[id].effect[effectName]);
+                    score[effectName] += answers[id] * questionsObject[id].effect[effectName];
+                }
+            }
+        }
+
+        // calc percentage
+
+        for (const i in Object.keys(max)) {
+            effectName = Object.keys(max)[i]
+
+            if (max[effectName] > 0) {
+                pct[effectName] = (100 * (max[effectName] + score[effectName]) / (2 * max[effectName])).toFixed(1)
+            } else {
+                pct[effectName] = 50
+            }
+        }
+        console.log(pct);
+
+        return pct;
+    }
+
+</script>
+</body>

@@ -1,0 +1,176 @@
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-99715444-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-99715444-2');
+    </script>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:400,700" rel="stylesheet">
+    <link href='style.css' rel='stylesheet' type='text/css'>
+    <title>SexValues Results</title>
+    <link rel="icon" type="x-icon" href="icon.png">
+    <link rel="shortcut icon" type="x-icon" href="icon.png">
+    <meta charset="utf-8">
+    <script>
+      version = "v0.3 (broken, still)" //Remember to update this before making changes to the test itself!
+    </script>
+    <script type="application/javascript" src="results_data.js"></script>
+
+</head>
+
+<body>
+    <h1>SexValues</h1>
+
+    <hr>
+    <p>🥺 pls fund my <a href="https://ko-fi.com/sunkdatadiver">caffeine habit</a></p>
+    <p>👉👈</p>
+
+    <h1>Results</h1>
+
+    <!-- HACK TO GET IMAGES WORK ON CANVAS -->
+    <img id="img-masculine" src="value_images/masculine.svg" height="128pt" width="128pt" style="display: none;"/>
+    <img id="img-hypersexual" src="value_images/hypersexual.svg" height="128pt" style="display: none;" />
+    <img id="img-dominant" src="value_images/dominant.svg" height="128pt" style="display: none;"/>
+    <img id="img-deviant" src="value_images/deviant.svg" height="128pt" style="display: none;"/>
+    <img id="img-affective" src="value_images/affection.svg" height="128pt" style="display: none;" />
+
+    <img id="img-feminine" src="value_images/feminine.svg" height="128pt" style="display: none;"/>
+    <img id="img-hyposexual" src="value_images/hyposexual.svg" height="128pt" style="display: none;" />
+    <img id="img-submissive" src="value_images/submissive.svg" height="128pt" style="display: none;"/>
+    <img id="img-pure" src="value_images/pure.svg" height="128pt" style="display: none;"/>
+    <img id="img-hedonist" src="value_images/hedonism.svg" height="128pt" style="display: none;" />
+
+
+    <canvas id="banner" width=800 height=750 style="font-family:Montserrat"></canvas>
+    <button class="button" onclick="location.href='index.html';" style="background-color: #2196f3;">Back</button> <br>
+    <hr/>
+
+
+    <!-- JavaScript for the test itself -->
+    <script>
+    function getQueryVariable(variable) {
+           var query = window.location.search.substring(1)
+           var vars = query.split("&")
+           for (var i=0;i<vars.length;i++) {
+                   var pair = vars[i].split("=")
+                   if(pair[0] == variable) {return pair[1]}
+           }
+           return(NaN);
+    }
+
+    function setBarValue(name, value) {
+        innerel = document.getElementById(name)
+        outerel = document.getElementById("bar-" + name)
+        outerel.style.width = (value + "%")
+        innerel.innerHTML = (value + "%")
+        if (innerel.offsetWidth + 15 > outerel.offsetWidth) {
+            innerel.style.visibility = "hidden"
+        }
+    }
+
+    function setLabel(val, ary) {
+            return ary[Math.min(parseInt(val / 100 * ary.length), ary.length - 1)]
+    }
+
+    // GET VALUES
+    masculine   = getQueryVariable("affect")
+    feminine    = (100 - masculine).toFixed(1)
+    hypersexual = getQueryVariable("drive")
+    dominant    = getQueryVariable("dominant")
+    deviant     = getQueryVariable("deviance")
+    affective   = getQueryVariable("affect")
+    hyposexual  = (100 - hypersexual).toFixed(1)
+    submissive  = (100 - dominant   ).toFixed(1)
+    pure        = (100 - deviant    ).toFixed(1)
+    hedonist    = (100 - affective  ).toFixed(1)
+
+
+    window.onload = function() {
+        var c = document.getElementById("banner")
+        var ctx = c.getContext("2d")
+        ctx.fillStyle = "#EEEEEE"
+        ctx.fillRect(0,0,800,750)
+
+        console.log("INIT")
+
+
+        //LOGOS ON THE IMAGE
+
+        var starting_height = 160;
+        for(let i = 0; i < values.left.length; i++){
+            img = document.getElementById("img-"+values.left[i]);
+            ctx.drawImage(img, 20, starting_height, 100, 100);
+            starting_height += 120
+        };
+
+        var starting_height = 160;
+        for(let i = 0; i < values.right.length; i++){
+            img = document.getElementById("img-"+values.right[i]);
+            ctx.drawImage(img, 680, starting_height, 100, 100);
+            starting_height += 120
+        };
+
+
+        ctx.fillStyle="#222222"
+
+        var starting_height = 170;
+        for(let i = 0; i < values.left.length; i++){
+            ctx.fillRect(120, starting_height, 560, 80)
+            starting_height += 120
+        }
+
+        //color fill
+        var starting_height = 174;
+
+        for(let i = 0; i < values.left.length; i++){
+            ctx.fillStyle=valueColors[values.left[i]]
+            ctx.fillRect(120, starting_height, 5.6*eval(values.left[i])-2, 72)
+            starting_height += 120
+        }
+
+        var starting_height = 174;
+
+        for(let i = 0; i < values.right.length; i++){
+            ctx.fillStyle=valueColors[values.right[i]]
+            ctx.fillRect(682-5.6*eval(values.right[i]), starting_height, 5.6*eval(values.right[i])-2, 72)
+            starting_height += 120
+        }
+
+
+        ctx.fillStyle="#222222"
+        ctx.font="700 80px Montserrat"
+        ctx.textAlign="left"
+        ctx.fillText("SexValues", 20, 90)
+        ctx.font = "400 50px Montserrat"
+
+        var starting_height = 227.5;
+        ctx.textAlign="left"
+        for(let i = 0; i < values.left.length; i++){
+            if (eval(values.left[i])  > 27) {ctx.fillText(eval(values.left[i]) + "%", 130, starting_height)}
+            starting_height += 120
+        }
+
+        var starting_height = 227.5;
+        ctx.textAlign="right"
+        for(let i = 0; i < values.right.length; i++){
+            if (eval(values.right[i])  > 27) {ctx.fillText(eval(values.right[i]) + "%", 670, starting_height)}
+            starting_height += 120
+        }
+
+        ctx.font="300 30px Montserrat"
+        ctx.fillText("sexvalues.github.io", 780, 60)
+        ctx.fillText(version, 780, 90)
+        ctx.textAlign="center"
+
+        var starting_height = 163;
+        for(let i = 0; i < values.left.length; i++){
+            ctx.font = "300 30px Montserrat"
+            ctx.fillText(axisNames[labels[i]]+": " + setLabel(eval(values.left[i]), axisArrays[labels[i]]), 400, starting_height)
+            starting_height += 120
+        }
+    }
+    </script>
+</body>

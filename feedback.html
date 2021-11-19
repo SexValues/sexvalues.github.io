@@ -1,0 +1,274 @@
+<head>
+    <meta charset="utf-8">
+    <title>SexValues Feedback</title>
+
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:400,700" rel="stylesheet">
+    <link href='style.css' rel='stylesheet' type='text/css'>
+    <link rel="icon" type="x-icon" href="icon.png">
+    <link rel="shortcut icon" type="x-icon" href="icon.png">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-99715444-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-99715444-2');
+    </script>
+    <!-- -->
+    <script type="application/javascript" src="questions_feedback.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+</head>
+
+<body>
+
+
+<h1>SexValues</h1>
+<hr>
+
+<h2 style="text-align:center;" id="question-number">All done!</h2>
+<p class="question" id="question-text">Did you complete this test in a serious (or at least unironic) manner?</p>
+<div id="answers">
+    <button class="button" id="serious_extra" onclick="init_question()" style="background-color: #1b5e20;">Yes, and I'd like to help improve it (with 18 questions)</button> <br>
+    <button class="button" id="serious" onclick="pass(true)" style="background-color: #4caf50;">Yes, but just get me to the results</button> <br>
+    <button class="button" onclick="pass(false)">Nah, just get me to the results</button> <br>
+    <button class="button" id="quiz" onclick="location.href='quiz.html';" style="background-color: #4caf50; display: none;">Do the quiz!</button> <br>
+</div>
+<button class="small_button" onclick="prev_question()" id="back_button" style="display: none;">Back</button>
+<button class="small_button_off" id="back_button_off" style="display: none;">Back</button><br>
+
+<!-- Test JS -->
+<script>
+
+    // Taken cookie
+
+    var taken = false;
+    try {
+      taken = (Cookies.get('taken') === undefined) ? false : Cookies.get('taken');
+      var taken = (taken === 'true');
+    } catch(err) {
+      taken = false;
+    }
+
+
+    // Declare previous answers (and unlock positive answers)
+
+    try {
+        testAnswers = JSON.parse(window.sessionStorage.answers);
+        testPercentages = JSON.parse(window.sessionStorage.percentages);
+    } catch(err) {
+        testAnswers = new Object();
+        testPercentages = new Object();
+    }
+
+
+    if (jQuery.isEmptyObject(testAnswers)) {
+        $('#quiz').show()
+        $('#serious_extra').hide()
+        $('#serious').hide()
+    }
+
+
+    // init variables
+    var answers = new Object();     // Store user's answers
+    var qn = 0; // Current question order
+
+
+    // Populate questionsObject
+
+    var questionsObject = new Object();     // Question objects with ID keys
+    questions.forEach(populateQO);
+
+    function populateQO(value) {
+      questionsObject[value['id']] = value
+    }
+
+    var questionsOrder = Object.keys(questionsObject);
+
+
+
+
+    // Init question
+
+    function init_question() {
+        if (jQuery.isEmptyObject(testAnswers)) {
+            location.href = `quiz.html`
+        }
+        current = questionsObject[questionsOrder[qn]]
+
+
+        $("#question-text").html(current.question);
+        $("#question-number").html("Question "+(qn + 1)+" of "+(questionsOrder.length));
+
+
+
+        $("#answers").empty();
+
+        if (current.questionType === "smallSelection") {
+            current.answers.forEach(createButton);
+
+        } else if (current.questionType === "bigSelection") {
+
+            $("#answers").append($('<select id="select" class="selection">'));
+
+            var opt = $(`<option value=null disabled selected>Click to choose</option>`);
+            $("#select").append(opt);
+
+            for (const key in current.answers) {
+                addSelect(key, current.answers[key])
+            }
+            $("<br>").insertAfter("#select");
+
+            var btn = $(`<button class="button" id="go" onclick="next_question(getActiveDropdown());" style="background-color:#4caf50; display: none;">Go!</button> <br>`);
+            $("#answers").append(btn);
+            createButton({"label":"Refuse to Answer","color":"#a9a9a9","effect":null});
+
+            $("#select").change(function(){
+                $("#go").show()
+            });
+        } else if (current.questionType === "customNumber") {
+            $("#answers").append($(`<input type="tel" id="number" class="num_input" maxlength="${current.range[1].toString().length}" min="${current.range[0]}" max="${current.range[1]}"> <br>`));
+
+            var btn = $(`<button class="button" id="go" onclick="next_question(getActiveNumber());" style="background-color:#4caf50; display: none;">Next!</button> <br>`);
+            $("#answers").append(btn);
+
+            createButton({"label":"Refuse to Answer","color":"#a9a9a9","effect":null});
+
+            $("#number").change(function(){
+                var nr = Number(getActiveNumber());
+                if ( (current.range[0] <= nr) && (nr => current.range[1]) ) {
+                    $("#go").show()
+                } else {
+                    $("#go").hide()
+                }
+            });
+        } else if (current.questionType === "customText") {
+            $("#answers").append($(`<input type="text" id="text" class="text_input"> <br>`));
+
+            var btn = $(`<button class="button" id="go" onclick="next_question(getActiveText());" style="background-color:#4caf50; display: none;">Next!</button> <br>`);
+            $("#answers").append(btn);
+
+            createButton({"label":"Refuse / Don't know","color":"#a9a9a9","effect":null});
+
+            $("#text").change(function(){
+                if ( getActiveText().length > 0 ) {
+                    $("#go").show()
+                } else {
+                    $("#go").hide()
+                }
+            });
+        }
+
+
+        if (jQuery.isEmptyObject(answers)) {
+            $('#back_button').hide()
+            $('#back_button_off').show()
+        } else {
+            $('#back_button').show()
+            $('#back_button_off').hide()
+        }
+    }
+
+
+    // Next question
+
+    function next_question(answer) {
+        if (qn === questionsOrder.length) {
+            return;
+        }
+
+        answers[questionsOrder[qn]] = answer;
+        qn++;
+
+        if (qn < questionsOrder.length) {
+            init_question();
+        } else {
+            pass(true);
+        }
+    }
+
+
+    // Previous question
+
+    function prev_question() {
+        if (jQuery.isEmptyObject(answers)) {
+            $('#back_button').hide()
+            $('#back_button_off').show()
+            return;
+        }
+        qn--;
+
+        delete answers[questionsOrder[qn]];
+
+        init_question();
+    }
+
+
+    // Methods to manipulate answering
+
+    function createButton(buttonInfo) {
+        if ( buttonInfo["effect"] === null || Number.isInteger(buttonInfo["effect"]) ) {
+            var btn = $(`<button class="button" onclick="next_question(${buttonInfo["effect"]})" style="background-color: ${buttonInfo["color"]};">${buttonInfo["label"]}</button> <br>`);
+        } else {
+            var btn = $(`<button class="button" onclick="next_question('${buttonInfo["effect"]}')" style="background-color: ${buttonInfo["color"]};">${buttonInfo["label"]}</button>  <br>`);
+        }
+        $("#answers").append(btn);
+    }
+
+    function addSelect(value, name) {
+        var opt = $(`<option value='${value}'>${name}</option>`);
+        $("#select").append(opt);
+    }
+
+    function getActiveDropdown() {
+        var selected = $("#select").children("option:selected").val();
+        return selected;
+    }
+
+    function getActiveNumber() {
+        var nr = $("#number").val();
+        return nr;
+    }
+
+    function getActiveText() {
+        var nr = $("#text").val();
+        return nr;
+    }
+
+
+
+    function sendDataAndRefer(answers, pct, extra) {
+        // Send to custom data collection server, if you want to add your test too, hit me up at altvalues8@gmail.com
+        $.ajax({
+            type: 'POST',
+            url: 'https://api.censusbot.app/v1/tests/submit',
+            contentType: 'application/json',
+            data: JSON.stringify({"test": 758913, "version": "0.3", "data": { "answers": testAnswers, "percents": pct, "extras": extra}}),
+            success: function(data){
+                console.log("Successfully sent request");
+                Cookies.set('taken', true, { expires: new Date(new Date().getTime() + 10 * 60 * 1000), sameSite: 'strict' })
+                location.href = `results.html?`+ window.location.search.substring(1)
+            },
+            error: function(){
+                console.log("Sending request failed");
+                Cookies.set('taken', true, { expires: new Date(new Date().getTime() + 10 * 60 * 1000), sameSite: 'strict' })
+                location.href = `results.html?`+ window.location.search.substring(1)
+            }
+        });
+    }
+
+    function pass(serious) {
+        // Some simple validation
+        if (serious === true && !jQuery.isEmptyObject(testAnswers) && taken !== true) {
+            sendDataAndRefer(testAnswers, testPercentages, answers);
+        } else {
+            Cookies.set('taken', true, { expires: new Date(new Date().getTime() + 10 * 60 * 1000), sameSite: 'strict' })
+            location.href = `results.html?`+ window.location.search.substring(1)
+        }
+    }
+
+</script>
+</body>
