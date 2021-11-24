@@ -1,5 +1,5 @@
 questions = [
-    //attract
+    // Attract
     {
         "id":1,
         "question": "I would have relationships with men.",
@@ -23,7 +23,7 @@ questions = [
     },
     {
         "id":4,
-        "question": "The benis only makes it better! (i like dick)",
+        "question": "The benis only makes it better! (I like dick)",
         "effect": {
             "attract": 1,
         }
@@ -50,8 +50,7 @@ questions = [
         }
     },
 
-    //drive
-
+    // Drive
     {
         "id":8,
         "question": "I sometimes find myself dreaming about lewd scenarios.",
@@ -95,8 +94,7 @@ questions = [
         }
     },
 
-    //dominant
-
+    // Dominant
     {
         "id":14,
         "question": "I like the idea of having power over someone.",
@@ -119,7 +117,7 @@ questions = [
         }
     },
 
-    //deviance
+    // Deviance
     {
         "id":17,
         "question": "I have frowned-upon kinks/fetishes.",
@@ -170,8 +168,7 @@ questions = [
         }
     },
 
-    //affect
-
+    // Affect
     {
         "id":24,
         "question": "I could only be lewd to my partner(s).",
