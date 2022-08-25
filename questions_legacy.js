@@ -23,14 +23,14 @@ questions = [
     },
     {
         "id":4,
-        "question": "The benis only makes it better! (I like dick)",
+        "question": "The penis only makes it better! (I like dick)",
         "effect": {
             "attract": 1,
         }
     },
     {
         "id":5,
-        "question": "I find myself attracted to soft skin, feminine clothing.",
+        "question": "I find myself attracted to soft skin & feminine clothing.",
         "effect": {
             "attract": -1,
         }
@@ -104,14 +104,14 @@ questions = [
     },
     {
         "id":15,
-        "question": "I (would) enjoy someone having control over me.",
+        "question": "I would enjoy someone having control over me.",
         "effect": {
             "dominant": -1,
         }
     },
     {
         "id":16,
-        "question": "I wouldn't be comfortable with getting dominated.",
+        "question": "I wouldn't be comfortable with being dominated.", // grammaticists prefer "being" over "getting" here
         "effect": {
             "dominant": 1,
         }
@@ -127,35 +127,35 @@ questions = [
     },
     {
         "id":18,
-        "question": "I belong to sub-communities associated with deviances.",
+        "question": "I belong to sub-communities associated with sexual deviances.", // "deviances" is vague.
         "effect": {
             "deviance": 1,
         }
     },
     {
         "id":19,
-        "question": "I (would) enjoy degrading or getting degraded.",
+        "question": "I would enjoy degrading and/or being degraded.", // same grammar consensus, and/or allows the person to realize both aren't required
         "effect": {
             "deviance": 1,
         }
     },
     {
         "id":20,
-        "question": "I (would) enjoy inflicting pain or having pain inflicted on me.",
+        "question": "I would enjoy inflicting pain and/or having pain inflicted on me.",
         "effect": {
             "deviance": 1,
         }
     },
     {
         "id":21,
-        "question": "I consider myself vanilla.",
+        "question": "I consider myself 'vanilla'.", // vanilla is a metaphor, thus add single-quotes
         "effect": {
             "deviance": -2,
         }
     },
     {
         "id":22,
-        "question": "I find most of fetishes disgusting.",
+        "question": "I find most fetishes disgusting.",
         "effect": {
             "deviance": -1,
         }
@@ -192,7 +192,7 @@ questions = [
     },
     {
         "id":27,
-        "question": "Sex is more about the pleasure than the intimacy.",
+        "question": "Sex is more about pleasure than intimacy.", // "the" redundant
         "effect": {
             "affect": -1
         }
